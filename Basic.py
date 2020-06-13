@@ -67,10 +67,30 @@ class Selection:
         if(type == 'default'):
             new_poplation = population[:-self.replace] + population[:self.replace]
         return new_poplation
+
+#mutation is used so that if every member of population is same then itdoesnt stop improving
+class Mutation:
+    def __init__(self):
+        print("Mutaion Initialised")
+    
+    def single_bit_mutation(self, data):
+        pos = random.randint(0, len(data)-1)
+        if(data[pos] == 1): data[pos] = 0
+        else: data[pos] = 1
+        return data
+
+    def set_mutation(self, data, single=True):
+        final = []
+        if(single):
+            final = [self.single_bit_mutation(x) for x in data]
+        else:
+            pass
+        return final
             
-SIZE = 5    #Size of each population
+SIZE = 10    #Size of each population
 POP = 12    #Population in each batch
-NOS_TOP = 8 #Number of top selected population per population
+NOS_TOP = 6 #Number of top selected population per population
+ITERATION = 20 #Number of Iteration 
 
 def main():
     replacement = POP - NOS_TOP
@@ -78,34 +98,16 @@ def main():
     selection = Selection(replacement)
     crossover = Crossover(SIZE,POP)
     population = population_generation(SIZE, POP)
-    for i in range(10):
+    mutation = Mutation()
+    for i in range(ITERATION):
         sorted_pop = sorted(population, key=calculate_fitness, reverse=True)  #sort according to fitness
         print("Current Population Fitness :{}".format(population_cal.calculate_set_fitness(sorted_pop)))
         selected_pop = selection.selection(sorted_pop)
         random.shuffle(sorted_pop) # Random Shuffling of population
         crossover_pop = crossover.crossover_set(selected_pop)
-        # print(population_cal.calculate_set_fitness(crossover_pop))
-        population = crossover_pop
-
-# def main():
-#     size = 5
-#     pop = 12
-#     nos_top = 8
-#     replacement = pop - nos_top  #number of nodes to replace
-#     population_cal = Population() 
-#     crossover = Crossover(size, pop)
-#     selection = Selection(replacement)
-#     population = population_generation(size, pop)
-#     sorted_pop = sorted(population, key=calculate_fitness, reverse=True)  #sort according to fitness
-#     print(population_cal.calculate_set_fitness(sorted_pop))
-#     print()
-#     selected_pop = selection.selection(sorted_pop)
-#     random.shuffle(selected_pop)
-#     print(population_cal.calculate_set_fitness(selected_pop))
-#     crossover_pop = crossover.crossover_set(selected_pop)
-#     print(crossover_pop)
-#     print(population_cal.calculate_set_fitness(crossover_pop))
-
+        muted_pop = mutation.set_mutation(crossover_pop)
+        # print(population_cal.calculate_set_fitness(muted_pop))
+        population = muted_pop
 
 if __name__ == "__main__":
     main()
