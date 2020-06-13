@@ -2,26 +2,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 
-#user defined functions start
-def calculate_fitness(data):  #change the value as per as need
-    sum_val = 0
-    for i,j in enumerate(reversed(data)):
-        sum_val += (2**i)*j
-    return sum_val
-
-def population_generation(size, nos_pop): 
-    return [random.choices([0,1], k=size) for _ in range(nos_pop)]
-
-#user defined function over
-
 class Population:
-    def __init__(self):
+    def __init__(self, calculate_fitness):
         print("Population Class Initialised")
-        global calculate_fitness
         self.calculate_fitness = calculate_fitness
     
     def calculate_set_fitness(self, data):
-        return [calculate_fitness(x) for x in data]
+        return [self.calculate_fitness(x) for x in data]
 
 class Crossover:
     def __init__(self, size, pop_size):
@@ -60,7 +47,6 @@ class Selection:
     def __init__(self, nos_selection):
         print("Selection Initialised")
         self.replace = nos_selection
-        self.population_process = Population()
     
     def selection(self, population, type='default'): 
         #function responsible for rearrangements 
@@ -104,32 +90,15 @@ class MultiPlot:
         plt.legend()
         plt.show()
 
-            
-SIZE = 10    #Size of each population
-POP = 12    #Population in each batch
-NOS_TOP = 4 #Number of top selected population per population
-ITERATION = 50 #Number of Iteration 
+class GeneticAlgorithm:
+    def __init__(self, size_of_each_population, population_batch_size,
+        number_top_population, iteration, population_generation, calculate_fitness):
 
-def main():
-    replacement = POP - NOS_TOP
-    population_cal = Population()
-    selection = Selection(replacement)
-    crossover = Crossover(SIZE,POP)
-    population = population_generation(SIZE, POP)
-    mutation = Mutation()
-    multiplot = MultiPlot(POP)
-    for i in range(ITERATION):
-        sorted_pop = sorted(population, key=calculate_fitness, reverse=True)  #sort according to fitness
-        multiplot.append_data(population_cal.calculate_set_fitness(sorted_pop))
-        print("Current Population Fitness :{}".format(population_cal.calculate_set_fitness(sorted_pop)))
-        selected_pop = selection.selection(sorted_pop)
-        random.shuffle(sorted_pop) # Random Shuffling of population
-        crossover_pop = crossover.crossover_set(selected_pop)
-        muted_pop = mutation.set_mutation(crossover_pop)
-        # print(population_cal.calculate_set_fitness(muted_pop))
-        population = muted_pop
-    multiplot.multi_plot()
-
-if __name__ == "__main__":
-    main()
-
+        replacement = size_of_each_population - number_top_population
+        self.calculate_fitness = calculate_fitness
+        self.population_cal = Population(self.calculate_fitness)
+        self.selection = Selection(replacement)
+        self.crossover = Crossover(size_of_each_population,population_batch_size)
+        self.population = population_generation(size_of_each_population, population_batch_size)
+        self.mutation = Mutation()
+        self.multiplot = MultiPlot(population_batch_size)
