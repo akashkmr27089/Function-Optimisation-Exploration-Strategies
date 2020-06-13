@@ -11,10 +11,11 @@ class Population:
         return [self.calculate_fitness(x) for x in data]
 
 class Crossover:
-    def __init__(self, size, pop_size):
+    def __init__(self, size, pop_size, selected_max):
         print("Crossover Class Initialised")
         self.size = size
-        self.pop_size = pop_size
+        self.pop_size = pop_size - selected_max
+        self.selected_top = selected_max
     
     def crossover_single(self,a,b,key):
         new_a = a[:key] + b[key:]
@@ -31,18 +32,20 @@ class Crossover:
         return new_a, new_b
 
     def crossover_set(self, population, single=True):
-        final_population = []
+        final_population = [population[x] for x in range(self.selected_top)]
         if(single): ## single crossver selected 
-            selection_index = random.choices([x for x in range(self.size)], k = self.pop_size//2)
-            for i in range(0,self.pop_size, 2):
+            selection_index = random.choices([x for x in range(self.size)], k = self.pop_size)
+            j = 0
+            for i in range(self.selected_top, self.pop_size + self.selected_top, 2):
                 final_population += list(self.crossover_single(population[i],population[i+1],
-                                    selection_index[i//2]))
+                                    selection_index[j]))
+                j+= 1
         else:
             pass 
             #Write fuction for double crossover
         return final_population
-            
 
+        
 class Selection:
     def __init__(self, nos_selection):
         print("Selection Initialised")
@@ -56,8 +59,9 @@ class Selection:
 
 #mutation is used so that if every member of population is same then itdoesnt stop improving
 class Mutation:
-    def __init__(self):
+    def __init__(self, top):
         print("Mutaion Initialised")
+        self.top = top
     
     def single_bit_mutation(self, data):
         pos = random.randint(0, len(data)-1)
@@ -65,10 +69,12 @@ class Mutation:
         else: data[pos] = 1
         return data
 
-    def set_mutation(self, data, single=True):
+    def set_mutation(self, data , single=True):
         final = []
         if(single):
-            final = [self.single_bit_mutation(x) for x in data]
+            for i,j in enumerate(data):
+                if(i<= self.top-1): final.append(j)
+                else: final.append(self.single_bit_mutation(j))
         else:
             pass
         return final
@@ -94,13 +100,13 @@ class GeneticAlgorithm:
     def __init__(self, size_of_each_population, population_batch_size,
         number_top_population, population_generation, calculate_fitness):
 
-        replacement = size_of_each_population - number_top_population
+        replacement = number_top_population
         self.calculate_fitness = calculate_fitness
         self.population_cal = Population(self.calculate_fitness)
         self.selection = Selection(replacement)
-        self.crossover = Crossover(size_of_each_population,population_batch_size)
+        self.crossover = Crossover(size_of_each_population,population_batch_size, replacement)
         self.population = population_generation(size_of_each_population, population_batch_size)
-        self.mutation = Mutation()
+        self.mutation = Mutation(number_top_population)
         self.multiplot = MultiPlot(population_batch_size)
         self.top_population = number_top_population
 
