@@ -123,7 +123,7 @@ def main():
         multiplot.append_data(population_cal.calculate_set_fitness(sorted_pop))
         print("Current Population Fitness :{}".format(population_cal.calculate_set_fitness(sorted_pop)))
         selected_pop = selection.selection(sorted_pop)
-        random.shuffle(sorted_pop) # Random Shuffling of population
+        #random.shuffle(selected_pop) # Random Shuffling of population
         crossover_pop = crossover.crossover_set(selected_pop)
         muted_pop = mutation.set_mutation(crossover_pop)
         # print(population_cal.calculate_set_fitness(muted_pop))

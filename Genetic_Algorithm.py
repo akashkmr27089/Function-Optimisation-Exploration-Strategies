@@ -92,7 +92,7 @@ class MultiPlot:
 
 class GeneticAlgorithm:
     def __init__(self, size_of_each_population, population_batch_size,
-        number_top_population, iteration, population_generation, calculate_fitness):
+        number_top_population, population_generation, calculate_fitness):
 
         replacement = size_of_each_population - number_top_population
         self.calculate_fitness = calculate_fitness
@@ -102,3 +102,20 @@ class GeneticAlgorithm:
         self.population = population_generation(size_of_each_population, population_batch_size)
         self.mutation = Mutation()
         self.multiplot = MultiPlot(population_batch_size)
+        self.top_population = number_top_population
+
+    def train(self, iteration):
+        for _ in range(iteration):
+            sorted_pop = sorted(self.population, key=self.calculate_fitness, reverse=True)
+            self.multiplot.append_data(self.population_cal.calculate_set_fitness(sorted_pop))
+            selected_pop = self.selection.selection(sorted_pop)
+            crossover_pop = self.crossover.crossover_set(selected_pop)
+            muted_pop = self.mutation.set_mutation(crossover_pop)
+            self.population = muted_pop
+        print("Trainig Over")
+
+    def display(self):
+        self.multiplot.multi_plot()
+
+    def top_population(self):
+        return self.population[:self.top_population]
