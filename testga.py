@@ -20,8 +20,8 @@ def population_generation(size, nos_pop):
     return [random.choices([x for x in range(10)], k=size) for _ in range(nos_pop)]
 
 SIZE = 10    #Size of each population
-POP = 120    #Population in each batch
-NOS_TOP = 20 #Number of top selected population per population
+POP = 20    #Population in each batch
+NOS_TOP = 6 #Number of top selected population per population --> should be even 
 ITERATION = 100 #Number of Iteration 
 
 genetic_algo = ga.GeneticAlgorithm(SIZE, POP, NOS_TOP, 9, population_generation, calculate_fitness)
