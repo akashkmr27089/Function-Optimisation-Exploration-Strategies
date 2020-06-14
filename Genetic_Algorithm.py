@@ -59,17 +59,23 @@ class Selection:
 
 #mutation is used so that if every member of population is same then itdoesnt stop improving
 class Mutation:
-    def __init__(self, top):
+    def __init__(self, top, max_possible_value):
         print("Mutaion Initialised")
         self.top = top
+        self.possible_value = max_possible_value
     
+    # def single_bit_mutation(self, data):
+    #     pos = random.randint(0, len(data)-1)
+    #     if(data[pos] == 1): data[pos] = 0
+    #     else: data[pos] = 1
+    #     return data
+
     def single_bit_mutation(self, data):
         pos = random.randint(0, len(data)-1)
-        if(data[pos] == 1): data[pos] = 0
-        else: data[pos] = 1
+        data[pos] = random.randint(0, self.possible_value)
         return data
 
-    def set_mutation(self, data , single=True):
+    def set_mutation(self, data, single=True):
         final = []
         if(single):
             for i,j in enumerate(data):
@@ -98,7 +104,7 @@ class MultiPlot:
 
 class GeneticAlgorithm:
     def __init__(self, size_of_each_population, population_batch_size,
-        number_top_population, population_generation, calculate_fitness):
+        number_top_population, max_possible_value, population_generation, calculate_fitness):
 
         replacement = number_top_population
         self.calculate_fitness = calculate_fitness
@@ -106,9 +112,10 @@ class GeneticAlgorithm:
         self.selection = Selection(replacement)
         self.crossover = Crossover(size_of_each_population,population_batch_size, replacement)
         self.population = population_generation(size_of_each_population, population_batch_size)
-        self.mutation = Mutation(number_top_population)
+        self.mutation = Mutation(number_top_population, max_possible_value)
         self.multiplot = MultiPlot(population_batch_size)
         self.top_population = number_top_population
+        self.population_batch_size = population_batch_size
 
     def train(self, iteration):
         for _ in range(iteration):
@@ -122,6 +129,3 @@ class GeneticAlgorithm:
 
     def display(self):
         self.multiplot.multi_plot()
-
-    def top_population(self):
-        return self.population[:self.top_population]
