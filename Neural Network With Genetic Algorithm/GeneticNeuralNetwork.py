@@ -10,7 +10,7 @@ from collections import OrderedDict
 def network_to_array(model):
     final_para = []
     for x in model.parameters():
-        x = list(x.detach().numpy().flatten())
+        x = list(x.cpu().detach().numpy().flatten())
         final_para += x
     return final_para  
 
@@ -36,6 +36,9 @@ def array_to_state_dict(data_list, model):
             tensor_data = torch.from_numpy(np.array(array_data))
             para.update({'fc'+str(int(i/2)+1)+'.bias':tensor_data})
     return OrderedDict(para)
+
+def population_size(model): 
+    return network_to_array(model).__len__()
 
 class actor(nn.Module):
     def __init__(self):
