@@ -50,6 +50,7 @@ class actor(nn.Module):
         x = nn.ReLU(x)
         return self.fc2(x)
 
+"""
 def main():
     actor_obj = actor()
     critic_obj = actor()
@@ -65,3 +66,4 @@ def main():
 
 if __name__ ==  "__main__":
     main()
+"""
