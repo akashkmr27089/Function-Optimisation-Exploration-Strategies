@@ -114,9 +114,11 @@ class MultiPlot:
 
 class GeneticAlgorithm:
     def __init__(self, size_of_each_population, population_batch_size,
-        number_top_population, selection_population, population_generation, calculate_fitness, network):
+        number_top_population, selection_population, population_generation, calculate_fitness, network, limits):
 
         replacement = number_top_population
+        self.max_score = 0
+        self.best_model = None
         self.calculate_fitness = calculate_fitness
         self.population_cal = Population(self.calculate_fitness, network)
         self.selection = Selection(replacement, self.population_cal, selection_population, network)
@@ -126,11 +128,19 @@ class GeneticAlgorithm:
         self.multiplot = MultiPlot(population_batch_size)
         self.top_population = number_top_population
         self.population_batch_size = population_batch_size
+        self.network = network
+        self.limits = limits
 
     def train(self, iteration, type_selection='roulette'):
-        for _ in range(iteration):
+        for i in range(iteration):
+            print("Iteration Number {} with current Maximum score of {}".format(i, self.max_score))
             sorted_pop = sorted(self.population, key=self.population_cal.calucluate_score, reverse=True)[:self.population_batch_size]
             self.multiplot.append_data(self.population_cal.calculate_set_fitness(sorted_pop))
+            current_max_score = self.population_cal.calucluate_score(sorted_pop[0])
+            if(current_max_score > self.max_score):
+                self.max_score = current_max_score
+                self.best_model = sorted_pop[0]
+            if(self.limits <= self.max_score): break
             selected_pop = self.selection.selection(sorted_pop, type_selection)
             crossover_pop = self.crossover.crossover_set(selected_pop)
             muted_pop = self.mutation.set_mutation(crossover_pop)
